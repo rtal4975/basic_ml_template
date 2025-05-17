@@ -1,0 +1,6 @@
+name: ENV_NAME_HERE
+dependencies:
+  - python=3.9
+  - numpy
+  - pandas
+  - scikit-learn
