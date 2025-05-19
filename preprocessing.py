@@ -57,7 +57,7 @@ def feature_reduction_PCA(data, to_dims, output_dir):
     reduced_data = pca.transform(data)
     
     # Save the PCA mapping to a file
-    output_file = os.path.join(output_dir,'pca_map_dim%s.pkl' % to_dims)
+    output_file = os.path.join(output_dir,'pca_map_dim.pkl')
     with open(output_file, 'wb') as file:
         pickle.dump(pca, file)
     

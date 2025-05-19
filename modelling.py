@@ -45,7 +45,12 @@ def save_metrics(history, output_dir, model_name):
 
 
 def save_model(model, output_dir, model_name):
-    # NOTE that model.save will make this model_path into a directory to store a bunch of stuff
+    '''
+    saving in "SavedModel format" with save_format='tf'
+    https://www.tensorflow.org/tutorials/keras/save_and_load
+
+    NOTE that model.save will make this model_path into a directory to store a bunch of stuff
+    '''
     model_path = os.path.join(output_dir, 'model', model_name)
     model.save(model_path, save_format='tf', include_optimizer=False)
     return

@@ -10,17 +10,27 @@ import glob
 import pickle
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 
 ### locals
 
 
 def load_model(model_dir):
-    model = ...
-    # TODO
+    # verify if model_dir is valid
+    if not os.path.exists(os.path.join(model_dir, "saved_model.pb")):
+        raise Exception("Given model_dir, %s, doesn't seem to be a valid tf.keras saved model." % model_dir)
+
+    model = tf.keras.models.load_model(model_dir)
+    # pretty sure we have to recompile, so just gonna copy/paste compile ftn from modelling.build()
+    # but if we change the method there, then we gotta remember to change here too!
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                  loss='mean_squared_error',
+                  metrics=['mae',])
+    
     return model
 
 
-def load_preprocessing(output_dir, pca_tag):
+def load_preprocessing(output_dir):
     scaler_X_file = glob.glob(os.path.join(output_dir, 'scaler_X.pkl'))[0]
     assert os.path.exists(scaler_X_file)
     with open(scaler_X_file, 'rb') as f:
@@ -31,7 +41,7 @@ def load_preprocessing(output_dir, pca_tag):
     with open(scaler_y_file, 'rb') as f:
         scaler_y = pickle.load(f)
 
-    pca_file = glob.glob(os.path.join(output_dir, 'pca_map_%s.pkl' % pca_tag))[0]
+    pca_file = glob.glob(os.path.join(output_dir, 'pca_map_dim.pkl'))[0]
     assert os.path.exists(pca_file)
     with open(pca_file, 'rb') as f:
         pca = pickle.load(f)
@@ -39,17 +49,16 @@ def load_preprocessing(output_dir, pca_tag):
     return scaler_X, scaler_y, pca
 
 
-def main(data_filepath, output_dir, pca_tag, target_colname=None, debug=False):
+def main(data_filepath, output_dir, target_colname=None, debug=False):
     '''
     mimic a lot of other code
 
     assuming column order is maintained in this data_file vs the one used in training
     '''
-    assert os.path.exists(data_filepath)
     df = pd.read_excel(data_filepath)
 
     ### mimic preprocess.main()
-    scaler_X, scaler_y, pca = load_preprocessing(output_dir, pca_tag)
+    scaler_X, scaler_y, pca = load_preprocessing(output_dir)
     categ_colnames = ['', '']
     numeric_colnames = [col for col in df.columns if col not in categ_colnames+target_colname]
     X = df[numeric_colnames+categ_colnames].values
@@ -71,3 +80,32 @@ def main(data_filepath, output_dir, pca_tag, target_colname=None, debug=False):
         y = scaler_y.transform(y, copy=True)
         loss = model.evaluate(X, y, batch_size=None)
         return loss
+
+
+
+if __name__=="__main__":
+    '''
+    conda activate py38_tf
+    python evaluate.py -f [FILEPATH] -o [OUTPUTDIR]
+    '''
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--filepath",
+                        type = str,
+                        required = True,
+                        help = "Filepath to data.")
+    parser.add_argument("-o", "--output_dir",
+                        type = str,
+                        required = True,
+                        help = "Filepath to model folder and training metadata.")
+    parser.add_argument("-d", "--debug",
+                        action = 'store_true',
+                        default = False,
+                        help = "Flag to go in debug-mode.")
+    args = parser.parse_args()
+    assert os.path.exists(args.filepath)
+    assert os.path.exists(args.output_dir)
+    assert os.path.isdir(args.output_dir)
+
+    target_colname = None
+    modelling_history = main(args.filepath, args.output_dir, target_colname, args.debug)
