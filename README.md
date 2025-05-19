@@ -6,8 +6,8 @@ Quick consult on how to build out a pipeline to train mixed data with a neural n
 Here is how to build out the conda environment with Python 3.__
 
 ```
-$ conda env create --file environment.yml -c conda-forge
-$ conda activate _______
+$ conda env create --file environment.yml
+$ conda activate py38_tf
 $ pip install tensorflow
 ```
 
@@ -16,7 +16,8 @@ $ pip install tensorflow
 Here is how to run the code
 
 ```
-$ TODO
+$ conda activate py38_tf
+$ python main.py -f [FILEPATH]
 ```
 
 ## Design Choice

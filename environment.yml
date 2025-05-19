@@ -1,6 +1,10 @@
-name: ENV_NAME_HERE
+name: py38_tf
+channels:
+  - conda-forge
+  - defaults
 dependencies:
-  - python=3.9
+  - python=3.8
   - numpy
   - pandas
+  - openpyxl
   - scikit-learn

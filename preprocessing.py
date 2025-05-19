@@ -57,7 +57,7 @@ def feature_reduction_PCA(data, to_dims, output_dir):
     reduced_data = pca.transform(data)
     
     # Save the PCA mapping to a file
-    output_file = os.path.join(output_dir,'pca_map_%s.pkl' % to_dims)
+    output_file = os.path.join(output_dir,'pca_map_dim%s.pkl' % to_dims)
     with open(output_file, 'wb') as file:
         pickle.dump(pca, file)
     
@@ -80,7 +80,7 @@ def split_data(X, y, output_dir, train_frac=0.75, seed=9):
     return X[train_indices], y[train_indices], X[test_indices], y[test_indices]
 
 
-def main(df,  output_dir, target_colname, categ_colnames=[]):
+def main(df, reduce_to_dims, output_dir, target_colname, categ_colnames=[]):
     # would be convenient for later if target_colname is a list
     if isinstance(target_colname, str):
         target_colname = [target_colname]
@@ -93,7 +93,7 @@ def main(df,  output_dir, target_colname, categ_colnames=[]):
 
     X = normalize(X, output_dir)
     y = normalize(y, output_dir)
-    X_numeric = feature_reduction_PCA(X[:,:len(numeric_colnames)], output_dir)
+    X_numeric = feature_reduction_PCA(X[:,:len(numeric_colnames)], reduce_to_dims, output_dir)
     X = np.hstack([X_numeric, X[:,-1*len(categ_colnames):]])
     X_train, y_train, X_test, y_test = split_data(X, y, output_dir)
 

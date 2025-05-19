@@ -39,7 +39,7 @@ def load_preprocessing(output_dir, pca_tag):
     return scaler_X, scaler_y, pca
 
 
-def predict(data_filepath, output_dir, pca_tag, target_colname=None, debug=False):
+def main(data_filepath, output_dir, pca_tag, target_colname=None, debug=False):
     '''
     mimic a lot of other code
 
