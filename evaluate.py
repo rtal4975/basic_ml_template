@@ -15,10 +15,15 @@ import tensorflow as tf
 ### locals
 
 
-def load_model(model_dir):
-    # verify if model_dir is valid
-    if not os.path.exists(os.path.join(model_dir, "saved_model.pb")):
-        raise Exception("Given model_dir, %s, doesn't seem to be a valid tf.keras saved model." % model_dir)
+def load_model(output_dir):
+    # look for model subdir in output_dir
+    poss_model_file = glob.glob(os.path.join(output_dir, "model", "**", "saved_model.pb"))
+    if len(poss_model_file) > 1:
+        raise Exception("Somehow found %i model .pb files in %s\nExpected only 1." % (len(poss_model_file), output_dir))
+    elif len(poss_model_file) == 0:
+        raise Exception("Coudln't find model .pb file in %s\nAssuming model dir not saved there after training." % output_dir)
+    else:
+        model_dir = os.path.dirname(poss_model_file[0])
 
     model = tf.keras.models.load_model(model_dir)
     # pretty sure we have to recompile, so just gonna copy/paste compile ftn from modelling.build()
