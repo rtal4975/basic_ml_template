@@ -42,9 +42,12 @@ def load_preprocessing(output_dir):
         scaler_X = pickle.load(f)
 
     scaler_y_file = glob.glob(os.path.join(output_dir, 'scaler_y.pkl'))[0]
-    assert os.path.exists(scaler_y_file)
-    with open(scaler_y_file, 'rb') as f:
-        scaler_y = pickle.load(f)
+    if os.path.exists(scaler_y_file):
+        with open(scaler_y_file, 'rb') as f:
+            scaler_y = pickle.load(f)
+    else:
+        # then we didn't want to scale our target variable
+        scaler_y = None
 
     pca_file = glob.glob(os.path.join(output_dir, 'pca_map_dim.pkl'))[0]
     assert os.path.exists(pca_file)
@@ -82,7 +85,8 @@ def main(data_filepath, output_dir, target_colname=None, debug=False):
     else:
         # then let's evaluate
         y = df[target_colname].values
-        y = scaler_y.transform(y, copy=True)
+        if scaler_y is not None:
+            y = scaler_y.transform(y, copy=True)
         loss = model.evaluate(X, y, batch_size=None)
         return loss
 
@@ -113,4 +117,4 @@ if __name__=="__main__":
     assert os.path.isdir(args.output_dir)
 
     target_colname = None
-    modelling_history = main(args.filepath, args.output_dir, target_colname, args.debug)
+    model_output = main(args.filepath, args.output_dir, target_colname, args.debug)

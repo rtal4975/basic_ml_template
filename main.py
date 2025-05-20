@@ -64,7 +64,7 @@ def main(output_parent_dir, data_filepath, use_fake, debug):
     
     modelling_history = []
     for reduce_to_dims in reduce_to_dims_range:
-        model_name = "__FILLMEIN__"
+        model_name = "VI_Prediction"
         output_child_dir = os.path.join(output_parent_dir, "dim%02i" % reduce_to_dims)
         os.makedirs(output_child_dir)
         print("\nModel %s training with dims reduced to %s with PCA:" % (model_name, reduce_to_dims))

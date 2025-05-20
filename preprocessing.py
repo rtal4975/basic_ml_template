@@ -92,10 +92,10 @@ def main(df, reduce_to_dims, output_dir, target_colname, categ_colnames=[]):
     y = df[target_colname].values # <- since target_colname is list, shape should be (nrows,1) so don't need to reshape
 
     X = normalize(X, output_dir)
-    y = normalize(y, output_dir)
+    #y = normalize(y, output_dir)
     X_numeric = feature_reduction_PCA(X[:,:len(numeric_colnames)], reduce_to_dims, output_dir)
     X = np.hstack([X_numeric, X[:,-1*len(categ_colnames):]])
-    X_train, y_train, X_test, y_test = split_data(X, y, output_dir)
+    X_train, y_train, X_test, y_test = split_data(X, y, output_dir, train_frac=1.0)
 
     return X_train, y_train, X_test, y_test
 
